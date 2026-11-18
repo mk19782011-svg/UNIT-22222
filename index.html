@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الامتحان الشامل Unit Two - إعداد المعلم محمد تيسير الخرشة</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-mid: #2563eb;
+            --primary-soft: #eff6ff;
+            --text-main: #0f172a;
+            --text-sub: #475569;
+            --border-light: #e2e8f0;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --danger-bg: #fef2f2;
+            --warning: #d97706;
+            --warning-bg: #fffbeb;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: Tahoma, Arial, sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 50%, #f0f9ff 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .app-wrapper {
+            width: 100%;
+            max-width: 850px;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+            overflow: hidden;
+        }
+
+        .welcome-screen { direction: rtl; }
+        .welcome-banner {
+            background: linear-gradient(125deg, #1e3a8a 0%, #2563eb 60%, #0284c7 100%);
+            padding: 36px 24px 48px;
+            text-align: center;
+            color: #ffffff;
+        }
+
+        .curriculum-pill {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-size: 0.88rem;
+            font-weight: bold;
+            margin-bottom: 14px;
+            direction: ltr;
+        }
+
+        .exam-main-title { font-size: 2.1rem; font-weight: bold; margin-bottom: 6px; }
+        .teacher-subtitle { font-size: 1.1rem; color: #e0f2fe; }
+
+        .welcome-body { padding: 0 28px 32px; margin-top: -26px; position: relative; }
+        .stats-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 22px; }
+        .stat-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 14px 10px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+            border: 1px solid var(--border-light);
+        }
+        .stat-label { font-size: 0.8rem; color: var(--text-sub); display: block; }
+        .stat-value { font-size: 1.05rem; font-weight: bold; color: var(--primary); }
+
+        .security-notice {
+            background: var(--warning-bg);
+            border: 1px solid #fde68a;
+            border-right: 4px solid var(--warning);
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 22px;
+            font-size: 0.9rem;
+            color: #78350f;
+            text-align: right;
+        }
+        .security-notice ul { margin-right: 20px; line-height: 1.7; }
+
+        .login-card { background: #f8fafc; border: 1px solid var(--border-light); border-radius: 18px; padding: 20px; margin-bottom: 16px; text-align: right; }
+        .input-label { display: block; font-weight: bold; font-size: 1rem; color: var(--text-main); margin-bottom: 8px; }
+        .name-field {
+            width: 100%;
+            padding: 15px 18px;
+            font-size: 1.05rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            background: #ffffff;
+            outline: none;
+        }
+        .name-field:focus { border-color: var(--primary-mid); }
+
+        .error-banner {
+            display: none;
+            background: var(--danger-bg);
+            color: var(--danger);
+            border: 1px solid #fecaca;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .btn-start {
+            width: 100%;
+            margin-top: 16px;
+            padding: 16px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 14px;
+            font-size: 1.15rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.28);
+        }
+
+        .btn-teacher-panel {
+            width: 100%;
+            padding: 13px 18px;
+            background: #ffffff;
+            color: var(--text-sub);
+            border: 1.5px solid #cbd5e1;
+            border-radius: 12px;
+            font-size: 0.98rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* شاشة الامتحان */
+        .exam-screen { display: none; padding: 24px; direction: ltr; }
+        .exam-top-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 14px; border-bottom: 2px solid #f1f5f9; margin-bottom: 16px; direction: rtl; }
+        .counter-pill { background: var(--primary-soft); color: var(--primary); padding: 6px 16px; border-radius: 50px; font-weight: bold; }
+        .progress-track { width: 100%; height: 9px; background: #e2e8f0; border-radius: 99px; overflow: hidden; margin-bottom: 22px; }
+        .progress-fill { height: 100%; background: #2563eb; width: 0%; transition: width 0.3s ease; }
+
+        .reading-passage {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-left: 5px solid var(--primary-mid);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 18px;
+            font-size: 0.92rem;
+            line-height: 1.7;
+            color: #1e293b;
+            text-align: left;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+        .reading-header { font-size: 0.75rem; font-weight: bold; color: var(--primary-mid); margin-bottom: 6px; display: block; }
+
+        .question-prompt { font-size: 1.1rem; font-weight: bold; color: var(--text-main); margin-bottom: 20px; line-height: 1.6; text-align: left; }
+        
+        .choices-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 26px; }
+        .choice-btn {
+            width: 100%;
+            text-align: left;
+            padding: 15px 18px;
+            background: #ffffff;
+            border: 2px solid var(--border-light);
+            border-radius: 14px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .choice-btn.active { border-color: var(--primary-mid); background: var(--primary-soft); font-weight: bold; }
+        .choice-badge { width: 34px; height: 34px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
+        .choice-btn.active .choice-badge { background: var(--primary-mid); color: #ffffff; }
+
+        .nav-controls { display: flex; gap: 12px; direction: rtl; }
+        .nav-btn { flex: 1; padding: 14px; border: none; border-radius: 12px; font-size: 1.02rem; font-weight: bold; cursor: pointer; }
+        .btn-back { background: #e2e8f0; color: var(--text-main); }
+        .btn-forward { background: var(--primary-mid); color: #ffffff; }
+        .btn-finish { background: var(--success); color: #ffffff; }
+
+        /* شاشة النتيجة */
+        .result-screen { display: none; padding: 32px 24px; text-align: center; direction: rtl; }
+        .score-ring { width: 150px; height: 150px; border-radius: 50%; background: var(--primary-soft); border: 7px solid var(--primary-mid); display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 18px auto; }
+        .score-big { font-size: 2.6rem; font-weight: bold; color: var(--primary); line-height: 1; }
+        .cheat-warning-banner { display: none; background: var(--danger-bg); color: var(--danger); border: 1px solid #fecaca; padding: 12px 16px; border-radius: 12px; font-weight: bold; margin: 12px 0; }
+
+        .review-wrapper { margin-top: 28px; border-top: 2px solid #f1f5f9; padding-top: 20px; text-align: left; direction: ltr; }
+        .review-item { background: #f8fafc; border: 1px solid var(--border-light); border-radius: 12px; padding: 15px; margin-bottom: 12px; }
+        .review-item.is-correct { border-left: 5px solid var(--success); background: #f0fdf4; }
+        .review-item.is-wrong { border-left: 5px solid var(--danger); background: #fef2f2; }
+
+        /* لوحة المعلم والنوافذ */
+        .teacher-screen { display: none; padding: 26px; direction: rtl; }
+        .teacher-top { display: flex; justify-content: space-between; align-items: center; padding-bottom: 14px; border-bottom: 2px solid #f1f5f9; margin-bottom: 16px; }
+        .table-box { overflow-x: auto; border: 1px solid var(--border-light); border-radius: 12px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+        th, td { padding: 12px 14px; text-align: right; border-bottom: 1px solid var(--border-light); }
+        th { background: #f1f5f9; font-weight: bold; }
+
+        .modal-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 9999; direction: rtl; }
+        .modal-card { background: #ffffff; border-radius: 20px; padding: 26px; width: 100%; max-width: 410px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="app-wrapper">
+    <!-- 1. شاشة الترحيب -->
+    <section id="welcomeScreen" class="welcome-screen">
+        <div class="welcome-banner">
+            <div class="curriculum-pill">Jordan High Note • Grade 12 • Unit Two</div>
+            <h1 class="exam-main-title">الامتحان الشامل (33 سؤالاً)</h1>
+            <div class="teacher-subtitle">👨‍🏫 إعداد المعلم: محمد تيسير الخرشة</div>
+        </div>
+
+        <div class="welcome-body">
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <span class="stat-label">عدد الأسئلة</span>
+                    <span class="stat-value">33 سؤال</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">العلامة الكلية</span>
+                    <span class="stat-value">من 100</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">نظام الاختبار</span>
+                    <span class="stat-value">مؤمّن وعشوائي</span>
+                </div>
+            </div>
+
+            <div class="security-notice">
+                <div style="font-weight: bold; margin-bottom: 4px;">⚠️ تعليمات نظام حماية الامتحان:</div>
+                <ul>
+                    <li>يُمنع الخروج من صفحة الامتحان أو الانتقال لتطبيق آخر أثناء الإجابة.</li>
+                    <li>في حال محاولة الخروج للمرة الثانية، يتم إغلاق الامتحان تلقائياً.</li>
+                </ul>
+            </div>
+
+            <div class="login-card">
+                <label for="studentNameInput" class="input-label">اسم الطالب الكامل (إجباري للدخول):</label>
+                <input type="text" id="studentNameInput" class="name-field" placeholder="اكتب اسمك الرباعي هنا..." autocomplete="off">
+                <div id="nameErrorBanner" class="error-banner">🚫 لا يمكن دخول الامتحان بدون كتابة اسم الطالب!</div>
+
+                <button type="button" class="btn-start" onclick="startExamFlow()">دخول وبدء الامتحان 🚀</button>
+            </div>
+
+            <div class="welcome-footer">
+                <button type="button" class="btn-teacher-panel" onclick="openTeacherModal()">🔐 لوحة المعلم (عرض نتائج الطلاب)</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. شاشة الامتحان -->
+    <section id="examScreen" class="exam-screen">
+        <div class="exam-top-bar">
+            <div class="student-tag" id="headerStudentName">👤 الطالب: </div>
+            <div class="counter-pill" id="headerQuestionCount">السؤال 1 من 33</div>
+        </div>
+
+        <div class="progress-track">
+            <div class="progress-fill" id="progressBarFill"></div>
+        </div>
+
+        <div id="readingPassageBox" class="reading-passage" style="display: none;">
+            <span class="reading-header">Read the text carefully to answer the question:</span>
+            <div id="readingPassageContent"></div>
+        </div>
+
+        <div id="questionPromptText" class="question-prompt"></div>
+        <div id="choicesContainer" class="choices-grid"></div>
+
+        <div class="nav-controls">
+            <button type="button" id="prevQuestionBtn" class="nav-btn btn-back" onclick="goPrevQuestion()">السابق</button>
+            <button type="button" id="nextQuestionBtn" class="nav-btn btn-forward" onclick="goNextQuestion()">السؤال التالي</button>
+            <button type="button" id="submitExamBtn" class="nav-btn btn-finish" style="display: none;" onclick="completeExam(false)">تسليم الامتحان ✔</button>
+        </div>
+    </section>
+
+    <!-- 3. شاشة النتيجة -->
+    <section id="resultScreen" class="result-screen">
+        <div style="display: inline-block; background: #eff6ff; color: #1e3a8a; padding: 6px 18px; border-radius: 50px; font-weight: bold;">تقرير النتيجة النهائية</div>
+        <h2 id="resultStudentTitle" style="font-size: 1.45rem; margin-top: 10px;"></h2>
+
+        <div id="cheatBannerResult" class="cheat-warning-banner">🚨 تم إنهاء الامتحان تلقائياً بسبب تكرار الخروج من صفحة الامتحان!</div>
+
+        <div class="score-ring">
+            <div class="score-big" id="finalScoreValue">0</div>
+            <div style="font-size: 0.95rem; font-weight: bold; color: var(--text-sub);">من 100</div>
+        </div>
+
+        <p id="scoreSummaryDetails" style="font-weight: bold; color: var(--text-sub); margin-bottom: 6px;"></p>
+        <p id="localSaveStatus" style="font-size: 0.88rem; color: var(--primary-mid); font-weight: bold;"></p>
+
+        <div class="review-wrapper">
+            <div class="review-heading" style="text-align: right; font-weight: bold; margin-bottom: 12px;">📋 مراجعة الإجابات والحلول الصحيحة:</div>
+            <div id="reviewListContainer"></div>
+        </div>
+    </section>
+
+    <!-- 4. لوحة المعلم -->
+    <section id="teacherDashboardScreen" class="teacher-screen">
+        <div class="teacher-top">
+            <div>
+                <h2 style="font-size: 1.3rem; color: var(--primary);">📊 لوحة المعلم - نتائج الطلاب</h2>
+                <p style="font-size: 0.85rem; color: var(--text-sub);">المعلم: محمد تيسير الخرشة | الامتحان الشامل Unit Two</p>
+            </div>
+            <button type="button" onclick="exitTeacherPanel()" style="padding: 9px 16px; border-radius: 10px; border: 1px solid #cbd5e1; background: #f8fafc; font-weight: bold; cursor: pointer;">العودة</button>
+        </div>
+
+        <div class="table-box">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>اسم الطالب</th>
+                        <th>العلامة (100)</th>
+                        <th>الإجابات</th>
+                        <th>الحالة</th>
+                        <th>الوقت</th>
+                    </tr>
+                </thead>
+                <tbody id="teacherTableBody">
+                    <tr><td colspan="6" style="text-align: center;">جاري التحميل...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+
+<!-- نافذة رمز المعلم -->
+<div id="teacherAuthModal" class="modal-backdrop">
+    <div class="modal-card">
+        <h3 style="color: var(--primary); margin-bottom: 8px;">🔐 لوحة المعلم</h3>
+        <p style="font-size: 0.9rem; color: var(--text-sub); margin-bottom: 14px;">أدخل الرمز السري</p>
+        <input type="password" id="teacherPasswordField" class="name-field" placeholder="الرمز السري..." style="text-align: center;">
+        <div id="teacherPassError" class="error-banner" style="justify-content: center;">❌ الرمز غير صحيح!</div>
+        <div style="display: flex; gap: 10px; margin-top: 16px;">
+            <button type="button" class="nav-btn btn-forward" onclick="checkTeacherAccess()">دخول</button>
+            <button type="button" class="nav-btn btn-back" onclick="closeTeacherModal()">إلغاء</button>
+        </div>
+    </div>
+</div>
+
+<!-- نافذة تحذير الغش -->
+<div id="cheatWarningModal" class="modal-backdrop">
+    <div class="modal-card" style="border: 2px solid var(--danger);">
+        <h3 style="color: var(--danger); margin-bottom: 10px;">⚠️ تحذير أمني!</h3>
+        <p style="font-size: 0.95rem; line-height: 1.7; margin-bottom: 18px;">تم رصد خروجك من صفحة الامتحان! في المحاولة الثانية سيتم إنهاء الامتحان تلقائياً.</p>
+        <button type="button" class="nav-btn" style="background: var(--danger); color: #fff; width: 100%;" onclick="closeCheatWarning()">فهمت، العودة للامتحان</button>
+    </div>
+</div>
+
+<script>
+    const p1 = "If Malek thought the platform was cramped, the carriage seemed worse. Every seat was taken, as well as every square inch of standing room. Those who could reach overhead and grasp the handrail to steady themselves were lucky. Many, including Malek, struggled to keep their balance with nothing at all to hold into. Unaccustomed to the motion, Malek faltered once or twice, then stood firm and stabilized himself. As the train approached the next station, those leaving began to shift in preparation for their exit. Malek wondered how they might navigate their way to the doors, but astonishingly they forged ahead and the carriage emptied slightly before filling up with new passengers.";
+    const p2 = "The journey continued. Malek was now in the rhythm of it, the same routine at one station and then another as people got on and off the train, dispersing on the platform or settling into some corner of the carriage. Three stops from Les Corts, the old man and woman stood up to leave. As they passed Malek, they smiled at him. He desperately wanted to say something, to make some friendly comment, but he was strangely lost for words. Then the doors closed and they were gone. Malek turned and saw that the old man had forgotten his book. It was still on the seat";
+    const p3 = "Malek crossed the Plaça de Catalunya in the intense heat of the afternoon. The city square was teeming with tourists and locals and he found the noise startling. Back home in the countryside, life moved at a gentle pace.\nWhen Malek had announced his intention to leave his home state for the first time and travel alone to Barcelona, everyone tried to talk him out of it, but he was determined. It was a dream since childhood to visit the great football stadium, Camp Nou. And now, in his early 20s, he was making it happen.";
+
+    const questionsBank = [
+        { passage: p1, q: "1- How did the train carriage feel compared to the platform?", options: ["It was less crowded than the platform.", "It was as quiet as the platform.", "It was worse and even more cramped than the platform.", "It was spacious and very comfortable."], answer: "It was worse and even more cramped than the platform." },
+        { passage: p1, q: "2. What was Malek's main challenge while standing in the carriage?", options: ["He couldn't find anything to hold onto to keep his balance.", "He was forced to sit near the door.", "He couldn't see the next station through the window.", "He dropped his personal belongings on the floor."], answer: "He couldn't find anything to hold onto to keep his balance." },
+        { passage: p1, q: "3. The underlined word (Those) refers to:", options: ["people", "cramped", "who could", "standing room"], answer: "people" },
+        { passage: p1, q: "4. Find a word in the text which means \"Slipped\"", options: ["stabilized", "wondered", "faltered", "forged ahead"], answer: "faltered" },
+        { passage: p2, q: "5. What does the pronoun \"another\" refer to in the text above?", options: ["passenger", "train", "journey", "station"], answer: "station" },
+        { passage: p2, q: "6. What does the word \"dispersing\" most nearly mean in the passage?", options: ["rushing", "Spreading out", "getting off", "crashing into"], answer: "Spreading out" },
+        { passage: p2, q: "7. Why didn't Malek speak to the old couple?", options: ["He did not understand their language", "He was too tired", "He was strangely lost for words", "They left too quickly"], answer: "He was strangely lost for words" },
+        { passage: p2, q: "8. What did Malek notice after the couple had gone?", options: ["The woman had dropped her bag", "The old man had left his book behind", "They took photos", "The carriage became empty"], answer: "The old man had left his book behind" },
+        { passage: p3, q: "9. The sentence that best fits the gap in the paragraph above is:", options: ["As they passed Malek, they smiled at him", "They reminded him of his grandparents back on the farm", "He watched the hordes and wondered about their lives", "On any given day, he never saw more than a handful of people"], answer: "On any given day, he never saw more than a handful of people" },
+        { passage: p3, q: "10. What was Malek's main motivation for traveling to Barcelona?", options: ["To meet relatives", "To study abroad", "To escape countryside life", "To visit Camp Nou stadium"], answer: "To visit Camp Nou stadium" },
+        { q: "11. (making eye-contact with someone). This figurative meaning is for............", options: ["sweep his eye", "find his eye", "caught his eye", "swept along with the crowds"], answer: "caught his eye" },
+        { q: "12. Do you think you would enjoy travelling at breakneck ....................?", options: ["speed", "brag", "mark", "hurdles"], answer: "speed" },
+        { q: "13. There has been a ............... with the project and we are unlikely to finish before next week now.", options: ["breakout", "lookout", "outcome", "setback"], answer: "setback" },
+        { q: "14. The whole process of delivery was fundamentally ........... resulting in my new phone taking two Months to arrive.", options: ["overrated", "flawed", "obvious", "mistaken"], answer: "flawed" },
+        { q: "15. I was so stressed while reading the speech that I ............. over some of the words.", options: ["staggered", "stumbled", "flew", "parked"], answer: "stumbled" },
+        { q: "16. It is a wonderful moment when a young child takes its first steps and ................s across the room.", options: ["stagger", "jump", "wobble", "lurch"], answer: "wobble" },
+        { q: "17. After hurting his ankle, the footballer ................. off the pitch to get some help.", options: ["hobbled", "strode", "surged", "lurched"], answer: "hobbled" },
+        { q: "18. The weather ........... for May sounds really good, so let's book a holiday for then.", options: ["setback", "outset", "outlay", "outlook"], answer: "outlook" },
+        { q: "19. Once we get the bank to agree on the loan, setting up the business should be ...... sailing.", options: ["clean", "hill", "open", "plain"], answer: "plain" },
+        { q: "20. The incessant noise of the roadworks outside his house is driving my uncle up the...........", options: ["wall", "hill", "path", "ship"], answer: "wall" },
+        { q: "21. He was in such a hurry that he jumped the lights and had a crash. The meaning of (jump) is:", options: ["use your feet to move in the air", "move on the water in a boat", "drive through a red light without stopping", "trip over something"], answer: "drive through a red light without stopping" },
+        { q: "22. I only said that it was getting late.", options: ["All I said was that it was getting late.", "All I said was that it was late getting.", "The only thing I say is that it was getting late.", "The only thing I say was that it was getting late."], answer: "All I said was that it was getting late." },
+        { q: "23. Miss Altabbakh was my favourite teacher at primary school.", options: ["It was Miss Altabbakh who was my favourite teacher at primary school.", "It is Miss Altabbakh who was my favourite teacher at primary school.", "It was Miss Altabbakh who is my favourite teacher at primary school", "The person who is my favourite teacher at primary school was Miss Altabbakh."], answer: "It was Miss Altabbakh who was my favourite teacher at primary school." },
+        { q: "24. She was so happy that she thought she would never stop smiling.", options: ["So happy was she that she thought she would never stop smiling.", "So happy she was that she thought she would never stop smiling.", "So happy she had been that she thought she would never stop smiling.", "So happy was she to think she would never stop smiling."], answer: "So happy was she that she thought she would never stop smiling." },
+        { q: "25. A passing driver waved at me to stop. Then I realised I had a flat tyre.", options: ["Only when a passing driver waved at me to stop I realise I had a flat tyre.", "Only when did a passing driver wave at me to stop did I realise I had a flat tyre.", "Only when a passing driver waved at me to stop did I realise I had a flat tyre.", "Only when had a passing driver waved at me to stop I realised I had a flat tyre."], answer: "Only when a passing driver waved at me to stop did I realise I had a flat tyre." },
+        { q: "26. The cyclist was definitely not to blame for the accident. The correct inversion sentence for the above one is:", options: ["No sooner was the cyclist to blame for the accident.", "Only when the cyclist was to blame for the accident.", "In no way was the cyclist to blame for the accident.", "Little is the cyclist to blame for the accident."], answer: "In no way was the cyclist to blame for the accident." },
+        { q: "27. A passion for cars unites the group. The correct cleft sentence for the above sentence is:", options: ["It's a passion for cars that united the group.", "A passion for cars has been what unites the group.", "What unites the group was a passion for cars.", "What unites the group is a passion for cars."], answer: "What unites the group is a passion for cars." },
+        { q: "28. I know everything about the course apart from the start date. The correct cleft sentence for the above sentence is:", options: ["What I don't know about the course was the start date", "What I don't know about the course is the start date", "The only thing I don't know about the course was the start date", "The only thing I know about the course is the start date"], answer: "What I don't know about the course is the start date" },
+        { q: "29. ............... was the speed that they started to scream.", options: ["Such", "So", "No sooner", "Not only"], answer: "Such" },
+        { q: "30. The way I was spoken to by the assistant was wholly ...........and I was treated as a problem rather than a customer", options: ["unjustified", "inaccurate", "obvious", "flawed"], answer: "unjustified" },
+        { q: "31. Which phrase is used to give preference?", options: ["I'm in two minds here.", "well, you could argue that.", "Alternatively, we could", "But on the other hand,......"], answer: "Alternatively, we could" },
+        { q: "32. What is the formal equivalent of \"luckily .....\"?", options: ["just in time", "you may remember that", "Finally, to our utter disbelief", "we were extremely fortunate"], answer: "we were extremely fortunate" },
+        { q: "33. All of these are correct at writing an email of complain except one:", options: ["Use clauses of concession to give balance.", "use passives to be more formal.", "Don't be polite, Be aggressive", "Use initial comment adverbs."], answer: "Don't be polite, Be aggressive" }
+    ];
+
+    let currentStudent = "";
+    let randomizedExam = [];
+    let activeIndex = 0;
+    let selectedAnswers = {};
+    let examInProgress = false;
+    let examCompleted = false;
+    let cheatAttempts = 0;
+
+    function shuffle(arr) {
+        const copy = [...arr];
+        for (let i = copy.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy;
+    }
+
+    function startExamFlow() {
+        const inputEl = document.getElementById("studentNameInput");
+        const errorEl = document.getElementById("nameErrorBanner");
+        const nameVal = inputEl.value.trim();
+
+        if (nameVal === "") {
+            errorEl.style.display = "block";
+            inputEl.focus();
+            return;
+        }
+
+        errorEl.style.display = "none";
+        currentStudent = nameVal;
+
+        randomizedExam = shuffle(questionsBank).map(item => ({
+            ...item,
+            mixedOptions: shuffle(item.options)
+        }));
+
+        activeIndex = 0;
+        selectedAnswers = {};
+        cheatAttempts = 0;
+        examInProgress = true;
+        examCompleted = false;
+
+        document.getElementById("headerStudentName").textContent = "👤 الطالب: " + currentStudent;
+        document.getElementById("welcomeScreen").style.display = "none";
+        document.getElementById("examScreen").style.display = "block";
+
+        displayCurrentQuestion();
+    }
+
+    function displayCurrentQuestion() {
+        const totalQ = randomizedExam.length;
+        const currentQ = randomizedExam[activeIndex];
+
+        document.getElementById("headerQuestionCount").textContent = `السؤال ${activeIndex + 1} من ${totalQ}`;
+        document.getElementById("progressBarFill").style.width = `${((activeIndex + 1) / totalQ) * 100}%`;
+
+        const passageBox = document.getElementById("readingPassageBox");
+        if (currentQ.passage) {
+            passageBox.style.display = "block";
+            document.getElementById("readingPassageContent").textContent = currentQ.passage;
+        } else {
+            passageBox.style.display = "none";
+        }
+
+        document.getElementById("questionPromptText").textContent = currentQ.q;
+
+        const choicesContainer = document.getElementById("choicesContainer");
+        choicesContainer.innerHTML = "";
+        const letters = ["A", "B", "C", "D"];
+
+        currentQ.mixedOptions.forEach((choiceText, i) => {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "choice-btn";
+            if (selectedAnswers[activeIndex] === choiceText) {
+                btn.classList.add("active");
+            }
+
+            btn.innerHTML = `
+                <span class="choice-badge">${letters[i]}</span>
+                <span>${choiceText}</span>
+            `;
+
+            btn.onclick = function() {
+                selectedAnswers[activeIndex] = choiceText;
+                displayCurrentQuestion();
+            };
+
+            choicesContainer.appendChild(btn);
+        });
+
+        document.getElementById("prevQuestionBtn").style.visibility = activeIndex === 0 ? "hidden" : "visible";
+        
+        const nextBtn = document.getElementById("nextQuestionBtn");
+        const submitBtn = document.getElementById("submitExamBtn");
+
+        if (activeIndex === totalQ - 1) {
+            nextBtn.style.display = "none";
+            submitBtn.style.display = "block";
+        } else {
+            nextBtn.style.display = "block";
+            submitBtn.style.display = "none";
+        }
+    }
+
+    function goPrevQuestion() {
+        if (activeIndex > 0) {
+            activeIndex--;
+            displayCurrentQuestion();
+        }
+    }
+
+    function goNextQuestion() {
+        if (activeIndex < randomizedExam.length - 1) {
+            activeIndex++;
+            displayCurrentQuestion();
+        }
+    }
+
+    document.addEventListener("visibilitychange", function() {
+        if (document.hidden && examInProgress && !examCompleted) {
+            cheatAttempts++;
+            if (cheatAttempts === 1) {
+                document.getElementById("cheatWarningModal").style.display = "flex";
+            } else if (cheatAttempts >= 2) {
+                document.getElementById("cheatWarningModal").style.display = "none";
+                completeExam(true);
+            }
+        }
+    });
+
+    function closeCheatWarning() {
+        document.getElementById("cheatWarningModal").style.display = "none";
+    }
+
+    function completeExam(cheated = false) {
+        if (examCompleted) return;
+        examCompleted = true;
+        examInProgress = false;
+
+        let correctCount = 0;
+        const totalQ = randomizedExam.length;
+        const reviewList = document.getElementById("reviewListContainer");
+        reviewList.innerHTML = "";
+
+        randomizedExam.forEach((item, idx) => {
+            const studentChoice = selectedAnswers[idx] || "لم يتم اختيار إجابة";
+            const isRight = studentChoice === item.answer;
+            if (isRight) correctCount++;
+
+            const card = document.createElement("div");
+            card.className = `review-item ${isRight ? "is-correct" : "is-wrong"}`;
+            card.innerHTML = `
+                <div style="font-weight: bold; margin-bottom: 6px; font-size: 0.96rem;">${item.q}</div>
+                <div style="font-size: 0.9rem; color: ${isRight ? 'var(--success)' : 'var(--danger)'};">
+                    <strong>Your Answer:</strong> ${studentChoice} ${isRight ? "✔" : "✘"}
+                </div>
+                ${!isRight ? `<div style="font-size: 0.9rem; color: var(--success); margin-top: 4px;"><strong>Correct Answer:</strong> ${item.answer}</div>` : ""}
+            `;
+            reviewList.appendChild(card);
+        });
+
+        const finalScore = Math.round((correctCount / totalQ) * 100);
+
+        document.getElementById("examScreen").style.display = "none";
+        document.getElementById("resultScreen").style.display = "block";
+        document.getElementById("resultStudentTitle").textContent = `الطالب: ${currentStudent}`;
+        document.getElementById("finalScoreValue").textContent = finalScore;
+        document.getElementById("scoreSummaryDetails").textContent = `عدد الإجابات الصحيحة: ${correctCount} من أصل ${totalQ}`;
+
+        if (cheated) {
+            document.getElementById("cheatBannerResult").style.display = "block";
+        }
+
+        const record = {
+            name: currentStudent,
+            score: finalScore,
+            correct: `${correctCount}/${totalQ}`,
+            status: cheated ? "غش (خروج متكرر)" : "مكتمل",
+            timestamp: new Date().toLocaleString()
+        };
+
+        const local = JSON.parse(localStorage.getItem("mk_comprehensive_exam") || "[]");
+        local.push(record);
+        localStorage.setItem("mk_comprehensive_exam", JSON.stringify(local));
+
+        document.getElementById("localSaveStatus").textContent = "✅ تم حفظ نتيجة الطالب محلياً على الجهاز بنجاح.";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    const TEACHER_SECRET = "MK1978mk";
+    function openTeacherModal() {
+        document.getElementById("teacherPassError").style.display = "none";
+        document.getElementById("teacherPasswordField").value = "";
+        document.getElementById("teacherAuthModal").style.display = "flex";
+    }
+    function closeTeacherModal() { document.getElementById("teacherAuthModal").style.display = "none"; }
+
+    function checkTeacherAccess() {
+        if (document.getElementById("teacherPasswordField").value === TEACHER_SECRET) {
+            closeTeacherModal();
+            document.getElementById("welcomeScreen").style.display = "none";
+            document.getElementById("teacherDashboardScreen").style.display = "block";
+            loadTeacherTable();
+        } else {
+            document.getElementById("teacherPassError").style.display = "flex";
+        }
+    }
+
+    function exitTeacherPanel() {
+        document.getElementById("teacherDashboardScreen").style.display = "none";
+        document.getElementById("welcomeScreen").style.display = "block";
+    }
+
+    function loadTeacherTable() {
+        const tbody = document.getElementById("teacherTableBody");
+        const local = JSON.parse(localStorage.getItem("mk_comprehensive_exam") || "[]").reverse();
+        if (local.length === 0) { 
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">لا توجد نتائج مسجلة حتى الآن.</td></tr>`; 
+            return; 
+        }
+        tbody.innerHTML = "";
+        local.forEach((rec, i) => {
+            const cheated = rec.status && rec.status.includes("غش");
+            tbody.innerHTML += `
+                <tr>
+                    <td>${i + 1}</td>
+                    <td style="font-weight: bold;">${rec.name}</td>
+                    <td style="font-weight: bold; color: var(--primary);">${rec.score} / 100</td>
+                    <td>${rec.correct}</td>
+                    <td style="color: ${cheated ? 'var(--danger)' : 'var(--success)'}; font-weight: bold;">${rec.status}</td>
+                    <td style="font-size: 0.82rem; color: var(--text-sub);">${rec.timestamp}</td>
+                </tr>
+            `;
+        });
+    }
+</script>
+
+</body>
+</html>
